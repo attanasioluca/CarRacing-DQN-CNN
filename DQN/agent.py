@@ -37,6 +37,14 @@ class Agent:
         self.replay_buffer = deque(maxlen=self.buffer_size)  # Simple list for storing experiences
         self.batch_size = 32  # Batch size for training
 
+        # Target Network Implementation
+        self.q_net_target = DQN(self.state_shape, self.action_n).to(self.device)
+        self.q_net_target.load_state_dict(self.q_net.state_dict())
+        self.q_net_target.eval()
+
+        self.target_update_freq = 1000  # how often (in steps) to update target net
+        self.train_step = 0
+
     def store_experience(self, state, action, reward, next_state, done):
         """
         Stores an experience in the replay buffer.
@@ -82,31 +90,26 @@ class Agent:
         return discrete_action
 
     def train(self):
-        """
-        Trains the Q-network using a batch of experiences from the replay buffer.
-        """
         if len(self.replay_buffer) < self.batch_size:
-            return  # Not enough experiences to sample a batch
+            return
 
-        # Sample a batch of experiences
         states, actions, rewards, next_states, dones = self.sample_experiences()
 
-        # Compute Q-values for the current states
-        q_values = self.q_net(states)  # Shape: [batch_size, action_n]
-        q_values = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)  # Ensure actions is 2D
+        q_values = self.q_net(states).gather(1, actions.unsqueeze(1)).squeeze(1)
 
-        # Compute target Q-values
         with torch.no_grad():
-            next_q_values = self.q_net(next_states).max(1)[0]  # Shape: [batch_size]
+            next_q_values = self.q_net_target(next_states).max(1)[0]
             targets = rewards + self.gamma * next_q_values * (1 - dones)
 
-        # Compute the loss
         loss = self.loss_fn(q_values, targets)
 
-        # Backpropagation
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+
+        self.train_step += 1
+        if self.train_step % self.target_update_freq == 0:
+            self.q_net_target.load_state_dict(self.q_net.state_dict())
 
     def update_epsilon(self):
         """
