@@ -43,23 +43,28 @@ for episode in range(num_episodes):
     agent.update_epsilon()
     # Log timing and performance every `log_interval` episodes
     if (episode + 1) % log_interval == 0:
-        eval_reward = 0
         old_epsilon = agent.epsilon
         agent.epsilon = 0.0  # Set epsilon to 0 for evaluation (no exploration)
-        state, _ = env.reset()
-        for step in range(max_steps_per_episode):        
-            action = agent.take_action(state)
-            next_state, reward, terminated, truncated, info = env.step(action)
-            done = terminated or truncated
-            state = next_state
-            eval_reward += reward
-            if done:
-                break
+        eval_rewards = []
+        for _ in range(5):  # Evaluate over 5 episodes
+            eval_reward = 0
+            state, _ = env.reset()
+            for step in range(max_steps_per_episode):        
+                action = agent.take_action(state)
+                next_state, reward, terminated, truncated, info = env.step(action)
+                done = terminated or truncated
+                state = next_state
+                eval_reward += reward
+                if done:
+                    break
+            eval_rewards.append(eval_reward)
+        eval_reward = np.mean(eval_rewards)
+        std_eval_reward = np.std(eval_rewards)
         agent.epsilon = old_epsilon # Restore old epsilon
         elapsed_time = time.time() - start_time  # Calculate elapsed time
         print(f"Episode {episode + 1}/{num_episodes}, Total Reward:{total_reward:.2f}, "
               f"Epsilon: {agent.epsilon:.2f}, Elapsed Time: {elapsed_time:.2f} seconds,", 
-              f"Eval Reward: {eval_reward:.2f}"
+              f"Eval Reward: {eval_reward:.2f}, with std: {std_eval_reward:.2f}"
         )
         start_time = time.time()  # Reset the timer for the next interval
 
