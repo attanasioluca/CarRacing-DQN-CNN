@@ -1,3 +1,4 @@
+from DQN import SkipFrame
 import gymnasium as gym
 from gymnasium.wrappers import FrameStackObservation
 from DQN import PreprocessFrame
@@ -7,6 +8,7 @@ import time  # Import time module for timing
 
 def make_env(render_mode=None):
     env = gym.make('CarRacing-v3', render_mode=render_mode, continuous=False)
+    env = SkipFrame(env, skip=4)  # Skip 4 frames
     env = PreprocessFrame(env)  # Convert to grayscale and resize to 84x84
     env = FrameStackObservation(env, 4)  # Stack 4 frames together to capture temporal information
     return env

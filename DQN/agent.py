@@ -41,6 +41,7 @@ class Agent:
         """
         Stores an experience in the replay buffer.
         """
+        reward = np.clip(reward, -1.0, 1.0)
         self.replay_buffer.append((state, action, reward, next_state, done))
 
     def sample_experiences(self):
