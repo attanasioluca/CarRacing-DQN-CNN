@@ -14,7 +14,6 @@ class Agent:
         self.epsilon = epsilon
         self.epsilon_decay = epsilon_decay
         self.epsilon_min = epsilon_min
-
         # Device setup
         self.device = "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -31,7 +30,7 @@ class Agent:
         # Replay buffer
         self.buffer_size = 10000
         self.replay_buffer = deque(maxlen=self.buffer_size)
-        self.batch_size = 32
+        self.batch_size = 64
 
         # Training bookkeeping
         self.target_update_freq = 10000  # update every 10k steps
@@ -58,14 +57,12 @@ class Agent:
         return states, actions, rewards, next_states, dones
 
     def take_action(self, state):
-        """Selects an action using epsilon-greedy policy."""
         if np.random.rand() < self.epsilon:
-            discrete_action = np.random.randint(self.action_n)
-        else:
-            state = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0) / 255.0
-            q_values = self.q_net(state)
-            discrete_action = torch.argmax(q_values, dim=1).item()
-        return discrete_action
+            return np.random.randint(self.action_n)  # 0..4
+        state_tensor = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0)
+        q_values = self.q_net(state_tensor)
+        return torch.argmax(q_values, dim=1).item()  # integer 0..4
+
 
     def train(self):
         # 🚨 Warm-up: don’t train until buffer has enough samples

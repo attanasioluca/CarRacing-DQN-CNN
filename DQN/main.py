@@ -46,7 +46,7 @@ for episode in range(num_episodes):
         old_epsilon = agent.epsilon
         agent.epsilon = 0.0  # Set epsilon to 0 for evaluation (no exploration)
         eval_rewards = []
-        for _ in range(5):  # Evaluate over 5 episodes
+        for _ in range(10):  # Evaluate over 10 episodes
             eval_reward = 0
             state, _ = env.reset()
             for step in range(max_steps_per_episode):        
@@ -69,7 +69,7 @@ for episode in range(num_episodes):
         start_time = time.time()  # Reset the timer for the next interval
 
 # Evaluation loop
-agent.reset_epsilon()
+agent.epsilon - 0.0
 num_eval_episodes = 10
 
 for episode in range(num_eval_episodes):
