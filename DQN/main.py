@@ -69,7 +69,7 @@ for episode in range(num_episodes):
         start_time = time.time()  # Reset the timer for the next interval
 
 # Evaluation loop
-agent.epsilon - 0.0
+agent.epsilon = 0.0
 num_eval_episodes = 10
 
 for episode in range(num_eval_episodes):
