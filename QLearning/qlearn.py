@@ -20,7 +20,12 @@ def qlearn(env: gym.Env, alpha0: float, gamma: float, max_steps: int):
         action = policy(obs, eps)
         obs2, rew, terminated, truncated, info = env.step(action)
         done = terminated or truncated
-        '''
+
+        Q[obs][action] = (1-alpha0)*Q[obs][action] + alpha0*(rew + gamma*np.max(Q[obs2]))
+        obs = obs2
+    return Q
+    
+'''
         new_dist = (abs((int(obs2/8)**2 + int(obs2%8)**2) - 2*49))**(1/2)
         if terminated and obs2 != 63:
             rew = -1
@@ -28,6 +33,3 @@ def qlearn(env: gym.Env, alpha0: float, gamma: float, max_steps: int):
             rew = 0.01 if dist > new_dist else -0.01 
             dist = new_dist
         '''
-        Q[obs][action] = (1-alpha0)*Q[obs][action] + alpha0*(rew + gamma*np.max(Q[obs2]))
-        obs = obs2
-    return Q

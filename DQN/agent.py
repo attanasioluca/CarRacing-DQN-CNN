@@ -4,7 +4,7 @@ from DQN import DQN
 from collections import deque
 
 class Agent:
-    def __init__(self, state_space_shape, action_n, gamma=0.99, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.1, lr=0.00025):
+    def __init__(self, state_space_shape, action_n, gamma=0.99, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.1, lr=0.000025):
         """
         A simple DQN agent for environments with discrete action spaces.
         """
@@ -30,7 +30,7 @@ class Agent:
         # Replay buffer
         self.buffer_size = 10000
         self.replay_buffer = deque(maxlen=self.buffer_size)
-        self.batch_size = 64
+        self.batch_size = 128
 
         # Training bookkeeping
         self.target_update_freq = 10000  # update every 10k steps
