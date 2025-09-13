@@ -3,15 +3,7 @@ import numpy as np
 
 class DiscretizedCarRacing(gym.Env):
     def __init__(self, lap_complete_percent=0.95, domain_randomize=False, continuous=False, reward_params=None):
-        """
-        Wrapper for CarRacing-v3 with discretized observation space and reward shaping.
 
-        Args:
-            lap_complete_percent (float): Percentage of the lap required to complete an episode.
-            domain_randomize (bool): Whether to randomize the environment.
-            continuous (bool): Whether to use continuous action space.
-            reward_params (dict): Parameters for reward shaping.
-        """
         self.env = gym.make(
             "CarRacing-v3",
             lap_complete_percent=lap_complete_percent,
@@ -30,33 +22,15 @@ class DiscretizedCarRacing(gym.Env):
         }
 
     def reset(self, **kwargs):
-        """
-        Resets the environment and returns the discretized initial observation.
-        """
         obs, info = self.env.reset(**kwargs)
         return self._discretize_obs(), info
 
     def step(self, action):
-        """
-        Takes a step in the environment.
-
-        Args:
-            action (int): Discrete action to take.
-
-        Returns:
-            tuple: Discretized observation, shaped reward, termination flag, truncation flag, and info.
-        """
         obs, rew, terminated, truncated, info = self.env.step(action)
         rew = self._shape_reward(rew)
         return self._discretize_obs(), rew, terminated, truncated, info
 
     def _discretize_obs(self):
-        """
-        Discretizes the observation space into a unique state index.
-
-        Returns:
-            int: Discretized state index.
-        """
         unwrapped = self.env.unwrapped
         car = unwrapped.car
 
@@ -75,40 +49,13 @@ class DiscretizedCarRacing(gym.Env):
         return state % 10_000
 
     def _discretize_speed(self, speed):
-        """
-        Discretizes the speed into bins.
-
-        Args:
-            speed (float): The speed of the car.
-
-        Returns:
-            int: Discretized speed bin.
-        """
         return int(np.digitize(speed, bins=np.linspace(0, 100, 5)))
 
     def _discretize_angle(self, angle):
-        """
-        Discretizes the angle into bins.
-
-        Args:
-            angle (float): The angle of the car.
-
-        Returns:
-            int: Discretized angle bin.
-        """
         ang_norm = (angle + np.pi) % (2 * np.pi)  # Normalize angle to [0, 2π]
         return int(ang_norm / (2 * np.pi / 8))  # Divide into 8 bins
 
     def _shape_reward(self, reward):
-        """
-        Shapes the reward to encourage forward motion and penalize angular velocity.
-
-        Args:
-            reward (float): Original reward from the environment.
-
-        Returns:
-            float: Shaped reward.
-        """
         car = self.env.unwrapped.car
         vel = car.hull.linearVelocity
         speed_forward = np.dot(

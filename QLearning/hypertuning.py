@@ -1,22 +1,16 @@
 import gymnasium as gym
-from main import test
+from eval import test
 
-alphas = [0.05, 0.1]
-gammas = [0.99]
-max_steps_list = [100000000]
-
-def hypertune_frozenlake(alpha, gamma, max_steps):
-
-    # Case 2: 8x8 FrozenLake, slippery  
-    env = gym.make('FrozenLake-v1', map_name="8x8", is_slippery=True)
-    test(env, alpha=alpha, gamma=gamma, max_steps=max_steps)
-
-    # Case 3: Car_Racing_v3, discretized observation/action spaces
-    # env = DiscretizedCarRacing(continuous=False)
-    # test(env, alpha=0.1, gamma=0.99, max_episode_steps=1000, max_steps=100000, eval_gamma=0.99, eval_episodes=100)
-
-for alpha in alphas:
-    for gamma in gammas:
-        for max_steps in max_steps_list:
-            print(f"Testing with alpha={alpha}, gamma={gamma}, max_steps={max_steps}")
-            hypertune_frozenlake(alpha, gamma, max_steps)
+def hypertune_frozenlake(size=8, slippery=True, steps=1000000):
+    alphas = [0.005, 0.01, 1]
+    gammas = [0.99]
+    env = gym.make('FrozenLake-v1', map_name="8x8", is_slippery=slippery) if size==8 else gym.make('FrozenLake-v1', map_name="4x4", is_slippery=slippery)
+    best_score = -float('inf')
+    best_params = (None, None)
+    for alpha in alphas:
+        for gamma in gammas:
+                avg_return = test(env, alpha, gamma, max_steps=steps, eval_episodes=10000, verbose=True)
+                if avg_return > best_score:
+                    best_score = avg_return
+                    best_params = (alpha, gamma)
+    return best_params
