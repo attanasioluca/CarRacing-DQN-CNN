@@ -5,9 +5,6 @@ from collections import deque
 
 class Agent:
     def __init__(self, state_space_shape, action_n, gamma=0.99, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.1, lr=0.000025):
-        """
-        A simple DQN agent for environments with discrete action spaces.
-        """
         self.state_shape = state_space_shape
         self.action_n = action_n
         self.gamma = gamma
@@ -32,22 +29,18 @@ class Agent:
         self.replay_buffer = deque(maxlen=self.buffer_size)
         self.batch_size = 128
 
-        # Training bookkeeping
-        self.target_update_freq = 10000  # update every 10k steps
+        self.target_update_freq = 10000 
         self.train_step = 0
 
     def store_experience(self, state, action, reward, next_state, done):
-        """Stores an experience in the replay buffer."""
         reward = np.clip(reward, -1.0, 1.0)
         self.replay_buffer.append((state, action, reward, next_state, done))
 
     def sample_experiences(self):
-        """Samples a batch of experiences from the replay buffer."""
         indices = np.random.choice(len(self.replay_buffer), self.batch_size, replace=False)
         batch = [self.replay_buffer[i] for i in indices]
         states, actions, rewards, next_states, dones = zip(*batch)
 
-        # Convert to tensors + normalize pixel values to [0,1]
         states = torch.tensor(np.array(states), dtype=torch.float32, device=self.device) / 255.0
         next_states = torch.tensor(np.array(next_states), dtype=torch.float32, device=self.device) / 255.0
         actions = torch.tensor(actions, dtype=torch.long, device=self.device)
@@ -58,14 +51,12 @@ class Agent:
 
     def take_action(self, state):
         if np.random.rand() < self.epsilon:
-            return np.random.randint(self.action_n)  # 0..4
+            return np.random.randint(self.action_n) # random actipn 
         state_tensor = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0)
         q_values = self.q_net(state_tensor)
-        return torch.argmax(q_values, dim=1).item()  # integer 0..4
-
+        return torch.argmax(q_values, dim=1).item() 
 
     def train(self):
-        # 🚨 Warm-up: don’t train until buffer has enough samples
         if len(self.replay_buffer) < max(self.batch_size * 10, 1000):
             return
 
@@ -88,9 +79,7 @@ class Agent:
             self.q_net_target.load_state_dict(self.q_net.state_dict())
 
     def update_epsilon(self):
-        """Decays epsilon after each episode."""
         self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
 
     def reset_epsilon(self):
-        """Resets epsilon to 1.0 (for evaluation)."""
         self.epsilon = 1.0

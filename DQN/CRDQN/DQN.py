@@ -5,7 +5,6 @@ import cv2
 import torch
 
 class PreprocessFrame(gym.ObservationWrapper):
-    """Convert frames to grayscale (84x84) and return HxW (no channel dim)."""
     def __init__(self, env):
         super().__init__(env)
         self.observation_space = gym.spaces.Box(
@@ -16,6 +15,7 @@ class PreprocessFrame(gym.ObservationWrapper):
         gray = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
         resized = cv2.resize(gray, (84, 84), interpolation=cv2.INTER_AREA)
         return resized  # shape: (84,84)
+    
 class SkipFrame(gym.Wrapper):
     def __init__(self, env, skip):
         super().__init__(env)
@@ -30,9 +30,6 @@ class SkipFrame(gym.Wrapper):
                 break
         return state, total_reward, terminated, truncated, info
 
-
-
-
 class DQN(nn.Module):
     def __init__(self, in_dim, out_dim):
         super().__init__()
@@ -46,9 +43,9 @@ class DQN(nn.Module):
             nn.Flatten()
         )
 
-        # Compute conv output size dynamically using a dummy forward pass
+        # generalization
         with torch.no_grad():
-            dummy = torch.zeros(1, *in_dim)  # shape: (1, C, H, W)
+            dummy = torch.zeros(1, *in_dim) 
             n_flatten = self.feature_extractor(dummy).shape[1]
 
         self.fc = nn.Sequential(

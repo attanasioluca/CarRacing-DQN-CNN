@@ -20,11 +20,11 @@ action_n = 5
 num_episodes = 2000
 max_steps_per_episode = 1000
 log_interval = 10
-
+ 
 agent = Agent(state_shape, action_n, epsilon_decay=((0.1) ** (1 / num_episodes)), lr=0.00001)
 
-best_eval_reward = -float("inf")  # Track the best evaluation reward
-start_time = time.time()  # Timer
+best_eval_reward = -float("inf")
+start_time = time.time()
 
 for episode in range(num_episodes):
     state, _ = env.reset()
@@ -84,7 +84,7 @@ for episode in range(num_episodes):
 agent.q_net.load_state_dict(torch.load("best_model.pth"))
 agent.q_net.eval()
 agent.epsilon = 0.0
-num_eval_episodes = 10
+num_eval_episodes = 100
 
 for episode in range(num_eval_episodes):
     state, _ = env.reset()

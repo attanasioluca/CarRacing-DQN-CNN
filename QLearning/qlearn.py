@@ -4,7 +4,6 @@ import numpy as np
 from collections import defaultdict
 from policies import EpsGreedyPolicy
 
-
 def qlearn(env: gym.Env, alpha0: float, gamma: float, max_steps: int):
     Q = defaultdict(lambda: np.zeros(env.action_space.n))
     policy = EpsGreedyPolicy(Q)
@@ -19,6 +18,6 @@ def qlearn(env: gym.Env, alpha0: float, gamma: float, max_steps: int):
         obs2, rew, terminated, truncated, info = env.step(action)
         done = terminated or truncated
 
-        Q[obs][action] = (1-alpha0)*Q[obs][action] + alpha0*(rew + gamma*np.max(Q[obs2]))
+        Q[obs][action] = (1-alpha0)*Q[obs][action] + alpha0*(rew + gamma*np.max(Q[obs2])) #Qfunction
         obs = obs2
     return Q
