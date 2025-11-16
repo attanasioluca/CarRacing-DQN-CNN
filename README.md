@@ -4,18 +4,12 @@ The agent uses a convolutional neural network, frame-stacking, replay buffer, ta
 
 Work in progress — improving stability, adding visualizations, and refining hyperparameters.
 
----
-<p float="left">
-  <img src="./screenshots/first.gif" width="49%" />
-  <img src="./screenshots/last.gif" width="49%" />
-</p>
-
-<p align="center">
-  <b>Left:</b> Early training (episode 1) • 
-  <b>Right:</b> Final agent behavior
-</p>
-
----
+<table>
+  <tr>
+    <td><img src="./screenshots/first.gif" width="100%">Early Training</td>
+    <td><img src="./screenshots/last.gif" width="100%">Final Behavior</td>
+  </tr>
+</table>
 
 ## Features
 - 🎮 Trains on `CarRacing-v3` (Gymnasium)
