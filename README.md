@@ -5,6 +5,17 @@ The agent uses a convolutional neural network, frame-stacking, replay buffer, ta
 Work in progress — improving stability, adding visualizations, and refining hyperparameters.
 
 ---
+<p float="left">
+  <img src="./screenshots/first.gif" width="49%" />
+  <img src="./screenshots/last.gif" width="49%" />
+</p>
+
+<p align="center">
+  <b>Left:</b> Early training (episode 1) • 
+  <b>Right:</b> Final agent behavior
+</p>
+
+---
 
 ## Features
 - 🎮 Trains on `CarRacing-v3` (Gymnasium)
@@ -90,10 +101,8 @@ DEVICE=cuda
 ## Screenshots
 
 ### Training reward curve
-![Reward Curve](./screenshots/reward-curve.png)
+![Reward Curve](./screenshots/results.png)
 
-### Agent trajectory
-![Driving Example](./screenshots/driving.png)
 
 ---
 
